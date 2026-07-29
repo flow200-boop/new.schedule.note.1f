@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskCal — To-Do List & Calendar</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">📅</span>
+        <span class="logo-text">TaskCal</span>
+      </div>
+      <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar">✕</button>
+    </div>
+
+    <button class="new-task-btn" id="new-task-btn">
+      <span class="btn-plus">+</span>
+      New Task
+    </button>
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Views</h3>
+      <nav class="view-nav">
+        <button class="view-btn active" data-view="month">📅 Month</button>
+        <button class="view-btn" data-view="week">📆 Week</button>
+        <button class="view-btn" data-view="day">📋 Day</button>
+        <button class="view-btn" data-view="list">📝 List</button>
+      </nav>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Categories</h3>
+      <div class="category-filters" id="category-filters">
+        <button class="category-chip active" data-category="all">
+          <span class="chip-dot" style="background: linear-gradient(135deg, #667eea, #764ba2)"></span>
+          All Tasks
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="section-title">Upcoming</h3>
+      <div class="upcoming-tasks" id="upcoming-tasks"></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="stats" id="stats">
+        <div class="stat-item">
+          <span class="stat-number" id="stat-total">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="stat-done">0</span>
+          <span class="stat-label">Done</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="stat-overdue">0</span>
+          <span class="stat-label">Overdue</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header" id="mobile-header">
+    <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+    <div class="logo">
+      <span class="logo-icon">📅</span>
+      <span class="logo-text">TaskCal</span>
+    </div>
+    <button class="mobile-new-btn" id="mobile-new-btn" aria-label="New task">+</button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Calendar Header -->
+    <div class="calendar-header" id="calendar-header">
+      <div class="header-left">
+        <button class="today-btn" id="today-btn">Today</button>
+        <div class="nav-arrows">
+          <button class="arrow-btn" id="prev-btn" aria-label="Previous">‹</button>
+          <button class="arrow-btn" id="next-btn" aria-label="Next">›</button>
+        </div>
+        <h2 class="current-date" id="current-date">July 2026</h2>
+      </div>
+      <div class="header-right">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Search tasks..." class="search-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="calendar-container" id="calendar-container">
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+
+    <!-- Day Detail Panel -->
+    <div class="day-panel hidden" id="day-panel">
+      <div class="day-panel-header">
+        <h3 id="day-panel-title">Today's Tasks</h3>
+        <button class="close-panel-btn" id="close-panel-btn">✕</button>
+      </div>
+      <div class="day-tasks-list" id="day-tasks-list"></div>
+    </div>
+  </main>
+
+  <!-- Task Modal -->
+  <div class="modal-overlay hidden" id="modal-overlay">
+    <div class="modal" id="task-modal">
+      <div class="modal-header">
+        <h2 id="modal-title">New Task</h2>
+        <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+      </div>
+      <form id="task-form" class="task-form">
+        <div class="form-group">
+          <label for="task-title">Title *</label>
+          <input type="text" id="task-title" required placeholder="What needs to be done?" class="form-input">
+        </div>
+        <div class="form-group">
+          <label for="task-description">Description</label>
+          <textarea id="task-description" placeholder="Add details..." class="form-input form-textarea"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-date">Date *</label>
+            <input type="date" id="task-date" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="task-time">Time</label>
+            <input type="time" id="task-time" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-end-date">End Date (for recurring)</label>
+            <input type="date" id="task-end-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="task-priority">Priority</label>
+            <select id="task-priority" class="form-input">
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-category">Category</label>
+            <select id="task-category" class="form-input">
+              <option value="personal">👤 Personal</option>
+              <option value="work">💼 Work</option>
+              <option value="health">💪 Health</option>
+              <option value="finance">💰 Finance</option>
+              <option value="learning">📚 Learning</option>
+              <option value="social">🎉 Social</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-recurrence">Recurrence</label>
+            <select id="task-recurrence" class="form-input">
+              <option value="none">None</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Bi-weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="task-reminder">Reminder</label>
+          <select id="task-reminder" class="form-input">
+            <option value="none">No reminder</option>
+            <option value="at-time">At time of event</option>
+            <option value="5min">5 minutes before</option>
+            <option value="15min">15 minutes before</option>
+            <option value="30min">30 minutes before</option>
+            <option value="1hour">1 hour before</option>
+            <option value="1day">1 day before</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="task-color">Color</label>
+          <div class="color-picker" id="color-picker">
+            <button type="button" class="color-swatch active" data-color="#667eea" style="background: #667eea"></button>
+            <button type="button" class="color-swatch" data-color="#f093fb" style="background: #f093fb"></button>
+            <button type="button" class="color-swatch" data-color="#4facfe" style="background: #4facfe"></button>
+            <button type="button" class="color-swatch" data-color="#43e97b" style="background: #43e97b"></button>
+            <button type="button" class="color-swatch" data-color="#fa709a" style="background: #fa709a"></button>
+            <button type="button" class="color-swatch" data-color="#fccb90" style="background: #fccb90"></button>
+            <button type="button" class="color-swatch" data-color="#a18cd1" style="background: #a18cd1"></button>
+            <button type="button" class="color-swatch" data-color="#ff9a9e" style="background: #ff9a9e"></button>
+          </div>
+        </div>
+        <input type="hidden" id="task-id" value="">
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="delete-task-btn" style="display:none">🗑️ Delete</button>
+          <div class="form-actions-right">
+            <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="save-btn">💾 Save Task</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
