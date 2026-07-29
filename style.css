@@ -269,6 +269,166 @@ body::after {
   flex-shrink: 0;
 }
 
+/* Quick To-Do Section */
+.quick-todo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quick-todo-input-wrapper {
+  display: flex;
+  gap: 6px;
+}
+
+.quick-todo-input {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.quick-todo-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.quick-todo-input::placeholder { color: var(--text-muted); }
+
+.quick-todo-add-btn {
+  width: 38px;
+  height: 38px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quick-todo-add-btn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.05);
+}
+
+.quick-todo-add-btn:active {
+  transform: scale(0.95);
+}
+
+.quick-todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.quick-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  transition: var(--transition);
+  border-left: 3px solid var(--accent);
+}
+
+.quick-todo-item:hover {
+  background: var(--bg-hover);
+}
+
+.quick-todo-item.completed {
+  opacity: 0.5;
+  border-left-color: var(--success);
+}
+
+.quick-todo-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-light);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+  background: transparent;
+}
+
+.quick-todo-checkbox:hover { border-color: var(--accent); }
+
+.quick-todo-checkbox.checked {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.quick-todo-checkbox.checked::after {
+  content: '✓';
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.quick-todo-text {
+  flex: 1;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-todo-item.completed .quick-todo-text {
+  text-decoration: line-through;
+}
+
+.quick-todo-delete {
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  opacity: 0;
+}
+
+.quick-todo-item:hover .quick-todo-delete {
+  opacity: 1;
+}
+
+.quick-todo-delete:hover {
+  background: rgba(255, 71, 87, 0.2);
+  color: var(--danger);
+}
+
+.quick-todo-empty {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 12px;
+}
+
 /* Upcoming Tasks */
 .upcoming-tasks {
   display: flex;

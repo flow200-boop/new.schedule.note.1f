@@ -6,7 +6,9 @@
 
 // ===== State =====
 const STORAGE_KEY = 'taskcal_data';
+const QUICK_TODO_KEY = 'taskcal_quick_todos';
 let tasks = [];
+let quickTodos = [];
 let currentView = 'month';
 let currentDate = new Date();
 let selectedDate = null;
@@ -40,6 +42,21 @@ const $$ = (sel) => document.querySelectorAll(sel);
 // ===== Storage =====
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function saveQuickTodos() {
+  localStorage.setItem(QUICK_TODO_KEY, JSON.stringify(quickTodos));
+}
+
+function loadQuickTodos() {
+  try {
+    const raw = localStorage.getItem(QUICK_TODO_KEY);
+    if (raw) {
+      quickTodos = JSON.parse(raw);
+    }
+  } catch {
+    quickTodos = [];
+  }
 }
 
 function loadData() {
@@ -751,6 +768,90 @@ function initReminders() {
   });
 }
 
+// ===== Quick To-Do =====
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function addQuickTodo(title) {
+  if (!title.trim()) return;
+  
+  const todo = {
+    id: 'qt_' + generateId(),
+    text: title.trim(),
+    completed: false,
+    createdAt: new Date().toISOString()
+  };
+  
+  quickTodos.unshift(todo);
+  saveQuickTodos();
+  renderQuickTodos();
+  showToast('To-do added! ✅', 'success');
+}
+
+function toggleQuickTodo(id) {
+  const todo = quickTodos.find(t => t.id === id);
+  if (!todo) return;
+  
+  todo.completed = !todo.completed;
+  saveQuickTodos();
+  renderQuickTodos();
+  
+  if (todo.completed) {
+    showToast('Completed! 🎉', 'success');
+  }
+}
+
+function deleteQuickTodo(id) {
+  quickTodos = quickTodos.filter(t => t.id !== id);
+  saveQuickTodos();
+  renderQuickTodos();
+}
+
+function renderQuickTodos() {
+  const container = $('#quick-todo-list');
+  if (!container) return;
+  
+  if (quickTodos.length === 0) {
+    container.innerHTML = '<div class="quick-todo-empty">No quick to-dos yet</div>';
+    return;
+  }
+  
+  container.innerHTML = quickTodos.map(todo => {
+    const completedClass = todo.completed ? ' completed' : '';
+    const checkedClass = todo.completed ? ' checked' : '';
+    const safeText = escapeHtml(todo.text);
+    
+    return `<div class="quick-todo-item${completedClass}">
+      <div class="quick-todo-checkbox${checkedClass}" 
+           onclick="toggleQuickTodo('${todo.id}')"></div>
+      <span class="quick-todo-text">${safeText}</span>
+      <button class="quick-todo-delete" onclick="deleteQuickTodo('${todo.id}')" aria-label="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function initQuickTodoListeners() {
+  const input = $('#quick-todo-input');
+  const addBtn = $('#quick-todo-add-btn');
+  
+  if (!input || !addBtn) return;
+  
+  addBtn.addEventListener('click', () => {
+    addQuickTodo(input.value);
+    input.value = '';
+  });
+  
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      addQuickTodo(input.value);
+      input.value = '';
+    }
+  });
+}
+
 // ===== Toast =====
 function showToast(message, type = 'info') {
   const container = $('#toast-container');
@@ -984,9 +1085,12 @@ function initEventListeners() {
 // ===== Init =====
 function init() {
   loadData();
+  loadQuickTodos();
   initEventListeners();
+  initQuickTodoListeners();
   requestNotificationPermission();
   initReminders();
+  renderQuickTodos();
   renderAll();
 }
 
