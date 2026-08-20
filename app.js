@@ -7,6 +7,9 @@
 // ===== State =====
 const STORAGE_KEY = 'taskcal_data';
 const QUICK_TODO_KEY = 'taskcal_quick_todos';
+const BACKUP_KEY = 'taskcal_backup';
+const SCHEMA_VERSION_KEY = 'taskcal_schema_version';
+const CURRENT_SCHEMA_VERSION = 1;
 let tasks = [];
 let quickTodos = [];
 let currentView = 'month';
@@ -32,20 +35,67 @@ const $$ = (sel) => document.querySelectorAll(sel);
 
 // ===== Storage =====
 function saveData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch (e) {
+    console.error('Failed to save tasks:', e);
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      showToast('Storage full. Please delete some tasks.', 'error');
+    }
+  }
 }
 
 function saveQuickTodos() {
-  localStorage.setItem(QUICK_TODO_KEY, JSON.stringify(quickTodos));
+  try {
+    localStorage.setItem(QUICK_TODO_KEY, JSON.stringify(quickTodos));
+  } catch (e) {
+    console.error('Failed to save quick todos:', e);
+  }
+}
+
+function validateTask(task) {
+  if (!task || typeof task !== 'object') return null;
+  if (!task.id || !task.title || !task.date) return null;
+  
+  return {
+    id: String(task.id),
+    title: String(task.title).trim(),
+    description: String(task.description || '').trim(),
+    date: String(task.date),
+    time: String(task.time || ''),
+    endDate: String(task.endDate || ''),
+    priority: ['low', 'medium', 'high'].includes(task.priority) ? task.priority : 'medium',
+    recurrence: ['none', 'daily', 'weekly', 'biweekly', 'monthly', 'yearly'].includes(task.recurrence) ? task.recurrence : 'none',
+    reminder: ['none', 'at-time', '5min', '15min', '30min', '1hour', '1day'].includes(task.reminder) ? task.reminder : 'none',
+    color: String(task.color || '#667eea'),
+    completed: Boolean(task.completed),
+    createdAt: String(task.createdAt || new Date().toISOString()),
+  };
+}
+
+function validateQuickTodo(todo) {
+  if (!todo || typeof todo !== 'object') return null;
+  if (!todo.id || !todo.text) return null;
+  
+  return {
+    id: String(todo.id),
+    text: String(todo.text).trim(),
+    completed: Boolean(todo.completed),
+    createdAt: String(todo.createdAt || new Date().toISOString()),
+  };
 }
 
 function loadQuickTodos() {
   try {
     const raw = localStorage.getItem(QUICK_TODO_KEY);
     if (raw) {
-      quickTodos = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        quickTodos = parsed.map(validateQuickTodo).filter(Boolean);
+      }
     }
-  } catch {
+  } catch (e) {
+    console.error('Failed to load quick todos:', e);
     quickTodos = [];
   }
 }
@@ -54,10 +104,87 @@ function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      tasks = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        tasks = parsed.map(validateTask).filter(Boolean);
+      }
     }
-  } catch {
+  } catch (e) {
+    console.error('Failed to load tasks:', e);
     tasks = [];
+  }
+}
+
+function createBackup() {
+  try {
+    const backup = {
+      tasks: tasks,
+      quickTodos: quickTodos,
+      timestamp: new Date().toISOString(),
+      version: CURRENT_SCHEMA_VERSION
+    };
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(backup));
+    return true;
+  } catch (e) {
+    console.error('Backup failed:', e);
+    return false;
+  }
+}
+
+function restoreBackup() {
+  try {
+    const raw = localStorage.getItem(BACKUP_KEY);
+    if (!raw) return false;
+    
+    const backup = JSON.parse(raw);
+    if (backup && Array.isArray(backup.tasks)) {
+      tasks = backup.tasks.map(validateTask).filter(Boolean);
+      saveData();
+      if (Array.isArray(backup.quickTodos)) {
+        quickTodos = backup.quickTodos.map(validateQuickTodo).filter(Boolean);
+        saveQuickTodos();
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Restore failed:', e);
+    return false;
+  }
+}
+
+function exportData() {
+  const data = {
+    tasks: tasks,
+    quickTodos: quickTodos,
+    exportDate: new Date().toISOString(),
+    version: CURRENT_SCHEMA_VERSION
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `taskcal-backup-${toDateString(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(jsonString) {
+  try {
+    const data = JSON.parse(jsonString);
+    if (data && Array.isArray(data.tasks)) {
+      tasks = data.tasks.map(validateTask).filter(Boolean);
+      saveData();
+      if (Array.isArray(data.quickTodos)) {
+        quickTodos = data.quickTodos.map(validateQuickTodo).filter(Boolean);
+        saveQuickTodos();
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Import failed:', e);
+    return false;
   }
 }
 
@@ -1037,10 +1164,33 @@ function initEventListeners() {
   });
 }
 
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (importData(e.target.result)) {
+      showToast('Data imported successfully', 'success');
+      initReminders();
+      renderQuickTodos();
+      renderAll();
+    } else {
+      showToast('Import failed - invalid file', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
 // ===== Init =====
 function init() {
   loadData();
   loadQuickTodos();
+  
+  // Create automatic backup of loaded data
+  createBackup();
+  
   initEventListeners();
   initQuickTodoListeners();
   requestNotificationPermission();

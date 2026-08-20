@@ -65,6 +65,11 @@
           <span class="stat-label">Overdue</span>
         </div>
       </div>
+      <div class="data-actions" style="display:flex;gap:6px;margin-top:10px;justify-content:center;">
+        <button class="btn btn-secondary" onclick="exportData()" style="font-size:0.7rem;padding:4px 8px;">Export</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" style="font-size:0.7rem;padding:4px 8px;">Import</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+      </div>
     </div>
   </aside>
 
