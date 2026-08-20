@@ -12,20 +12,11 @@ let quickTodos = [];
 let currentView = 'month';
 let currentDate = new Date();
 let selectedDate = null;
-let activeCategory = 'all';
 let searchQuery = '';
 let editingTaskId = null;
 let selectedColor = '#667eea';
 let reminderTimers = {};
 
-const CATEGORIES = {
-  personal: { label: 'Personal', emoji: '👤', color: 'var(--cat-personal)' },
-  work: { label: 'Work', emoji: '💼', color: 'var(--cat-work)' },
-  health: { label: 'Health', emoji: '💪', color: 'var(--cat-health)' },
-  finance: { label: 'Finance', emoji: '💰', color: 'var(--cat-finance)' },
-  learning: { label: 'Learning', emoji: '📚', color: 'var(--cat-learning)' },
-  social: { label: 'Social', emoji: '🎉', color: 'var(--cat-social)' },
-};
 
 const RECURRENCE_LABELS = {
   daily: '🔄 Daily',
@@ -176,10 +167,6 @@ function generateRecurringDates(task) {
 
 function getFilteredTasks() {
   let filtered = tasks;
-
-  if (activeCategory !== 'all') {
-    filtered = filtered.filter(t => t.category === activeCategory);
-  }
 
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
@@ -425,7 +412,6 @@ function renderListView() {
 
     groups[dateStr].forEach(task => {
       const completedClass = task.completed ? ' completed' : '';
-      const catInfo = CATEGORIES[task.category] || CATEGORIES.personal;
 
       html += `<div class="task-card fade-in" style="border-left-color:${task.color || '#667eea'}" onclick="editTask('${task.id}')">
         <div class="task-card-header">
@@ -436,7 +422,6 @@ function renderListView() {
         <div class="task-card-meta">
           ${task.time ? `<span class="task-card-time">🕐 ${formatTime(task.time)}</span>` : ''}
           <span class="task-card-priority ${task.priority}">${task.priority}</span>
-          <span class="task-card-category">${catInfo.emoji} ${catInfo.label}</span>
           ${task.recurrence && task.recurrence !== 'none' ? `<span class="task-card-recurrence">${RECURRENCE_LABELS[task.recurrence]}</span>` : ''}
         </div>
       </div>`;
@@ -471,7 +456,6 @@ function openDayPanel(dateStr) {
   } else {
     list.innerHTML = dayTasks.map(task => {
       const completedClass = task.completed ? ' completed' : '';
-      const catInfo = CATEGORIES[task.category] || CATEGORIES.personal;
 
       return `<div class="task-card fade-in" style="border-left-color:${task.color || '#667eea'}" onclick="editTask('${task.id}')">
         <div class="task-card-header">
@@ -483,7 +467,6 @@ function openDayPanel(dateStr) {
         <div class="task-card-meta">
           ${task.time ? `<span class="task-card-time">🕐 ${formatTime(task.time)}</span>` : ''}
           <span class="task-card-priority ${task.priority}">${task.priority}</span>
-          <span class="task-card-category">${catInfo.emoji} ${catInfo.label}</span>
           ${task.recurrence && task.recurrence !== 'none' ? `<span class="task-card-recurrence">${RECURRENCE_LABELS[task.recurrence]}</span>` : ''}
         </div>
       </div>`;
@@ -495,29 +478,6 @@ function openDayPanel(dateStr) {
 
 // ===== Rendering: Sidebar =====
 function renderSidebar() {
-  const catContainer = $('#category-filters');
-  let catHtml = `<button class="category-chip${activeCategory === 'all' ? ' active' : ''}" data-category="all">
-    <span class="chip-dot" style="background: var(--text-secondary)"></span>
-    All Tasks
-  </button>`;
-
-  Object.entries(CATEGORIES).forEach(([key, cat]) => {
-    const count = tasks.filter(t => t.category === key).length;
-    catHtml += `<button class="category-chip${activeCategory === key ? ' active' : ''}" data-category="${key}">
-      <span class="chip-dot" style="background: ${cat.color}"></span>
-      ${cat.emoji} ${cat.label}
-      ${count > 0 ? `<span style="margin-left:auto;font-size:0.7rem;color:var(--text-muted)">${count}</span>` : ''}
-    </button>`;
-  });
-  catContainer.innerHTML = catHtml;
-
-  catContainer.querySelectorAll('.category-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      activeCategory = chip.dataset.category;
-      renderAll();
-    });
-  });
-
   const upcomingContainer = $('#upcoming-tasks');
   const now = startOfDay(new Date());
   const upcoming = tasks
@@ -536,10 +496,7 @@ function renderSidebar() {
       const dateObj = new Date(task.date + 'T00:00:00');
       const isTaskOverdue = isOverdue(task);
       const label = isToday(dateObj) ? 'Today' : formatDate(dateObj);
-      const catInfo = CATEGORIES[task.category] || CATEGORIES.personal;
-
       return `<div class="upcoming-item${isTaskOverdue ? ' overdue' : ''}" onclick="editTask('${task.id}')">
-        <span>${catInfo.emoji}</span>
         <span class="upcoming-title">${task.title}</span>
         <span class="upcoming-date">${label}</span>
       </div>`;
@@ -577,7 +534,7 @@ function createTask(data) {
     time: data.time || '',
     endDate: data.endDate || '',
     priority: data.priority || 'medium',
-    category: data.category || 'personal',
+
     recurrence: data.recurrence || 'none',
     reminder: data.reminder || 'none',
     color: data.color || '#667eea',
@@ -683,7 +640,6 @@ function openEditModal(taskId) {
   $('#task-time').value = task.time || '';
   $('#task-end-date').value = task.endDate || '';
   $('#task-priority').value = task.priority;
-  $('#task-category').value = task.category;
   $('#task-recurrence').value = task.recurrence;
   $('#task-reminder').value = task.reminder;
   $('#task-id').value = task.id;
@@ -971,7 +927,6 @@ function initEventListeners() {
       time: $('#task-time').value,
       endDate: $('#task-end-date').value,
       priority: $('#task-priority').value,
-      category: $('#task-category').value,
       recurrence: $('#task-recurrence').value,
       reminder: $('#task-reminder').value,
       color: selectedColor,

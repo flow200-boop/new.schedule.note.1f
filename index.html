@@ -35,16 +35,6 @@
     </div>
 
     <div class="sidebar-section">
-      <h3 class="section-title">Categories</h3>
-      <div class="category-filters" id="category-filters">
-        <button class="category-chip active" data-category="all">
-          <span class="chip-dot" style="background: var(--text-secondary)"></span>
-          All Tasks
-        </button>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
       <h3 class="section-title">Quick To-Do</h3>
       <div class="quick-todo-section" id="quick-todo-section">
         <div class="quick-todo-input-wrapper">
@@ -157,24 +147,13 @@
           <div class="form-group">
             <label for="task-priority">Priority</label>
             <select id="task-priority" class="form-input">
-              <option value="low">🟢 Low</option>
-              <option value="medium" selected>🟡 Medium</option>
-              <option value="high">🔴 High</option>
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
             </select>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label for="task-category">Category</label>
-            <select id="task-category" class="form-input">
-              <option value="personal">👤 Personal</option>
-              <option value="work">💼 Work</option>
-              <option value="health">💪 Health</option>
-              <option value="finance">💰 Finance</option>
-              <option value="learning">📚 Learning</option>
-              <option value="social">🎉 Social</option>
-            </select>
-          </div>
           <div class="form-group">
             <label for="task-recurrence">Recurrence</label>
             <select id="task-recurrence" class="form-input">
