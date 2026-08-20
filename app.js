@@ -497,7 +497,7 @@ function openDayPanel(dateStr) {
 function renderSidebar() {
   const catContainer = $('#category-filters');
   let catHtml = `<button class="category-chip${activeCategory === 'all' ? ' active' : ''}" data-category="all">
-    <span class="chip-dot" style="background: linear-gradient(135deg, #667eea, #764ba2)"></span>
+    <span class="chip-dot" style="background: var(--text-secondary)"></span>
     All Tasks
   </button>`;
 
