@@ -19,20 +19,20 @@ let selectedColor = '#667eea';
 let reminderTimers = {};
 
 const CATEGORIES = {
-  personal: { label: 'Personal', emoji: '', color: 'var(--cat-personal)' },
-  work: { label: 'Work', emoji: '', color: 'var(--cat-work)' },
-  health: { label: 'Health', emoji: '', color: 'var(--cat-health)' },
-  finance: { label: 'Finance', emoji: '', color: 'var(--cat-finance)' },
-  learning: { label: 'Learning', emoji: '', color: 'var(--cat-learning)' },
-  social: { label: 'Social', emoji: '', color: 'var(--cat-social)' },
+  personal: { label: 'Personal', emoji: '👤', color: 'var(--cat-personal)' },
+  work: { label: 'Work', emoji: '💼', color: 'var(--cat-work)' },
+  health: { label: 'Health', emoji: '💪', color: 'var(--cat-health)' },
+  finance: { label: 'Finance', emoji: '💰', color: 'var(--cat-finance)' },
+  learning: { label: 'Learning', emoji: '📚', color: 'var(--cat-learning)' },
+  social: { label: 'Social', emoji: '🎉', color: 'var(--cat-social)' },
 };
 
 const RECURRENCE_LABELS = {
-  daily: 'Daily',
-  weekly: 'Weekly',
-  biweekly: 'Bi-weekly',
-  monthly: 'Monthly',
-  yearly: 'Yearly',
+  daily: '🔄 Daily',
+  weekly: '🔄 Weekly',
+  biweekly: '🔄 Bi-weekly',
+  monthly: '🔄 Monthly',
+  yearly: '🔄 Yearly',
 };
 
 // ===== DOM Helpers =====
@@ -389,8 +389,8 @@ function renderListView() {
   if (filtered.length === 0) {
     container.innerHTML = `
       <div class="empty-state fade-in">
-        <div class="empty-state-icon">—</div>
-        <div class="empty-state-text">No tasks yet</div>
+        <div class="empty-state-icon">📋</div>
+        <div class="empty-state-text">No tasks yet. Click "+ New Task" to get started!</div>
       </div>`;
     return;
   }
@@ -434,7 +434,7 @@ function renderListView() {
           <div class="task-card-title${completedClass}">${task.title}</div>
         </div>
         <div class="task-card-meta">
-          ${task.time ? `<span class="task-card-time">${formatTime(task.time)}</span>` : ''}
+          ${task.time ? `<span class="task-card-time">🕐 ${formatTime(task.time)}</span>` : ''}
           <span class="task-card-priority ${task.priority}">${task.priority}</span>
           <span class="task-card-category">${catInfo.emoji} ${catInfo.label}</span>
           ${task.recurrence && task.recurrence !== 'none' ? `<span class="task-card-recurrence">${RECURRENCE_LABELS[task.recurrence]}</span>` : ''}
@@ -465,7 +465,7 @@ function openDayPanel(dateStr) {
   if (dayTasks.length === 0) {
     list.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">—</div>
+        <div class="empty-state-icon">📭</div>
         <div class="empty-state-text">No tasks for this day</div>
       </div>`;
   } else {
@@ -481,7 +481,7 @@ function openDayPanel(dateStr) {
         </div>
         ${task.description ? `<div style="font-size:0.8rem;color:var(--text-secondary);margin:4px 0 6px">${task.description}</div>` : ''}
         <div class="task-card-meta">
-          ${task.time ? `<span class="task-card-time">${formatTime(task.time)}</span>` : ''}
+          ${task.time ? `<span class="task-card-time">🕐 ${formatTime(task.time)}</span>` : ''}
           <span class="task-card-priority ${task.priority}">${task.priority}</span>
           <span class="task-card-category">${catInfo.emoji} ${catInfo.label}</span>
           ${task.recurrence && task.recurrence !== 'none' ? `<span class="task-card-recurrence">${RECURRENCE_LABELS[task.recurrence]}</span>` : ''}
@@ -530,7 +530,7 @@ function renderSidebar() {
     .slice(0, 5);
 
   if (upcoming.length === 0) {
-    upcomingContainer.innerHTML = '<div class="upcoming-empty">No upcoming tasks</div>';
+    upcomingContainer.innerHTML = '<div class="upcoming-empty">No upcoming tasks 🎉</div>';
   } else {
     upcomingContainer.innerHTML = upcoming.map(task => {
       const dateObj = new Date(task.date + 'T00:00:00');
@@ -589,7 +589,7 @@ function createTask(data) {
   saveData();
   scheduleReminder(task);
   renderAll();
-  showToast('Task created', 'success');
+  showToast('Task created! ✨', 'success');
   return task;
 }
 
@@ -602,7 +602,7 @@ function updateTask(id, data) {
   clearReminder(id);
   scheduleReminder(tasks[idx]);
   renderAll();
-  showToast('Task updated', 'info');
+  showToast('Task updated! ✏️', 'info');
   return tasks[idx];
 }
 
@@ -611,7 +611,7 @@ function deleteTask(id) {
   saveData();
   clearReminder(id);
   renderAll();
-  showToast('Task deleted', 'warning');
+  showToast('Task deleted 🗑️', 'warning');
 }
 
 function toggleTask(id) {
@@ -624,7 +624,7 @@ function toggleTask(id) {
   renderAll();
 
   if (task.completed) {
-    showToast('Task completed', 'success');
+    showToast('Task completed! 🎉', 'success');
   }
 }
 
@@ -637,7 +637,7 @@ function moveTask(taskId, newDate) {
   clearReminder(taskId);
   scheduleReminder(task);
   renderAll();
-  showToast('Task moved', 'info');
+  showToast('Task moved! 📅', 'info');
 }
 
 // ===== Modal =====
@@ -744,7 +744,7 @@ function clearReminder(taskId) {
 }
 
 function triggerReminder(task) {
-  showToast(`Reminder: ${task.title}`, 'warning');
+  showToast(`⏰ Reminder: ${task.title}`, 'warning');
 
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification('TaskCal Reminder', {
@@ -788,7 +788,7 @@ function addQuickTodo(title) {
   quickTodos.unshift(todo);
   saveQuickTodos();
   renderQuickTodos();
-  showToast('To-do added', 'success');
+  showToast('To-do added! ✅', 'success');
 }
 
 function toggleQuickTodo(id) {
@@ -800,7 +800,7 @@ function toggleQuickTodo(id) {
   renderQuickTodos();
   
   if (todo.completed) {
-    showToast('Completed', 'success');
+    showToast('Completed! 🎉', 'success');
   }
 }
 

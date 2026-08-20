@@ -6,14 +6,14 @@
   <title>TaskCal — To-Do List & Calendar</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
-        <span class="logo-icon">TC</span>
+        <span class="logo-icon">📅</span>
         <span class="logo-text">TaskCal</span>
       </div>
       <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar">✕</button>
@@ -27,10 +27,10 @@
     <div class="sidebar-section">
       <h3 class="section-title">Views</h3>
       <nav class="view-nav">
-        <button class="view-btn active" data-view="month">Month</button>
-        <button class="view-btn" data-view="week">Week</button>
-        <button class="view-btn" data-view="day">Day</button>
-        <button class="view-btn" data-view="list">List</button>
+        <button class="view-btn active" data-view="month">📅 Month</button>
+        <button class="view-btn" data-view="week">📆 Week</button>
+        <button class="view-btn" data-view="day">📋 Day</button>
+        <button class="view-btn" data-view="list">📝 List</button>
       </nav>
     </div>
 
@@ -82,7 +82,7 @@
   <header class="mobile-header" id="mobile-header">
     <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
     <div class="logo">
-      <span class="logo-icon">TC</span>
+      <span class="logo-icon">📅</span>
       <span class="logo-text">TaskCal</span>
     </div>
     <button class="mobile-new-btn" id="mobile-new-btn" aria-label="New task">+</button>
@@ -102,7 +102,7 @@
       </div>
       <div class="header-right">
         <div class="search-box">
-          <span class="search-icon">⌕</span>
+          <span class="search-icon">🔍</span>
           <input type="text" id="search-input" placeholder="Search tasks..." class="search-input">
         </div>
       </div>
@@ -157,9 +157,9 @@
           <div class="form-group">
             <label for="task-priority">Priority</label>
             <select id="task-priority" class="form-input">
-              <option value="low">Low</option>
-              <option value="medium" selected>Medium</option>
-              <option value="high">High</option>
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
             </select>
           </div>
         </div>
@@ -167,12 +167,12 @@
           <div class="form-group">
             <label for="task-category">Category</label>
             <select id="task-category" class="form-input">
-              <option value="personal">Personal</option>
-              <option value="work">Work</option>
-              <option value="health">Health</option>
-              <option value="finance">Finance</option>
-              <option value="learning">Learning</option>
-              <option value="social">Social</option>
+              <option value="personal">👤 Personal</option>
+              <option value="work">💼 Work</option>
+              <option value="health">💪 Health</option>
+              <option value="finance">💰 Finance</option>
+              <option value="learning">📚 Learning</option>
+              <option value="social">🎉 Social</option>
             </select>
           </div>
           <div class="form-group">
@@ -214,10 +214,10 @@
         </div>
         <input type="hidden" id="task-id" value="">
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" id="delete-task-btn" style="display:none">Delete</button>
+          <button type="button" class="btn btn-secondary" id="delete-task-btn" style="display:none">🗑️ Delete</button>
           <div class="form-actions-right">
             <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="save-btn">Save</button>
+            <button type="submit" class="btn btn-primary" id="save-btn">💾 Save Task</button>
           </div>
         </div>
       </form>
