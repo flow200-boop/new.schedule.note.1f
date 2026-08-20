@@ -70,6 +70,7 @@ function validateTask(task) {
     color: String(task.color || '#667eea'),
     completed: Boolean(task.completed),
     createdAt: String(task.createdAt || new Date().toISOString()),
+    completedAt: task.completedAt ? String(task.completedAt) : null,
   };
 }
 
@@ -223,6 +224,18 @@ function formatTime(t) {
   const ampm = h >= 12 ? 'PM' : 'AM';
   const hour = h % 12 || 12;
   return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`;
+}
+
+function formatTimestamp(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  return date.toLocaleString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
 }
 
 function toDateString(d) {
@@ -547,9 +560,13 @@ function renderListView() {
           <div class="task-card-title${completedClass}">${task.title}</div>
         </div>
         <div class="task-card-meta">
-          ${task.time ? `<span class="task-card-time">🕐 ${formatTime(task.time)}</span>` : ''}
+          ${task.time ? `<span class="task-card-time">${formatTime(task.time)}</span>` : ''}
           <span class="task-card-priority ${task.priority}">${task.priority}</span>
           ${task.recurrence && task.recurrence !== 'none' ? `<span class="task-card-recurrence">${RECURRENCE_LABELS[task.recurrence]}</span>` : ''}
+        </div>
+        <div class="task-card-timestamps">
+          <span class="task-card-timestamp">Created: ${formatTimestamp(task.createdAt)}</span>
+          ${task.completedAt ? `<span class="task-card-timestamp completed">Completed: ${formatTimestamp(task.completedAt)}</span>` : ''}
         </div>
       </div>`;
     });
@@ -592,9 +609,13 @@ function openDayPanel(dateStr) {
         </div>
         ${task.description ? `<div style="font-size:0.8rem;color:var(--text-secondary);margin:4px 0 6px">${task.description}</div>` : ''}
         <div class="task-card-meta">
-          ${task.time ? `<span class="task-card-time">🕐 ${formatTime(task.time)}</span>` : ''}
+          ${task.time ? `<span class="task-card-time">${formatTime(task.time)}</span>` : ''}
           <span class="task-card-priority ${task.priority}">${task.priority}</span>
           ${task.recurrence && task.recurrence !== 'none' ? `<span class="task-card-recurrence">${RECURRENCE_LABELS[task.recurrence]}</span>` : ''}
+        </div>
+        <div class="task-card-timestamps">
+          <span class="task-card-timestamp">Created: ${formatTimestamp(task.createdAt)}</span>
+          ${task.completedAt ? `<span class="task-card-timestamp completed">Completed: ${formatTimestamp(task.completedAt)}</span>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -667,6 +688,7 @@ function createTask(data) {
     color: data.color || '#667eea',
     completed: false,
     createdAt: new Date().toISOString(),
+    completedAt: null,
   };
 
   tasks.push(task);
@@ -703,6 +725,7 @@ function toggleTask(id) {
   if (!task) return;
 
   task.completed = !task.completed;
+  task.completedAt = task.completed ? new Date().toISOString() : null;
   saveData();
   clearReminder(id);
   renderAll();

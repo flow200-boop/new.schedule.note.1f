@@ -822,6 +822,24 @@ body {
   color: var(--accent);
 }
 
+.task-card-timestamps {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.task-card-timestamp {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.task-card-timestamp.completed {
+  color: var(--success);
+}
+
 .empty-state {
   text-align: center;
   padding: 32px 16px;
